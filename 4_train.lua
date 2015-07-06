@@ -19,7 +19,8 @@ require 'optim'   -- an optimization package, for online and batch methods
 
 print '==> defining some tools'
 -- classes
-classes = {'1', '2', '3', '4'} 
+-- classes = {'1', '2', '3', '4'} 
+classes = {'1', '2', '3'} 
 
 -- This matrix records the current confusion across classes
 confusion = optim.ConfusionMatrix(#classes, classes)
@@ -175,7 +176,7 @@ function train()
    end
 
    -- save/log current net
-   local filename = paths.concat(opt.save, 'model.net')
+   local filename = paths.concat(opt.save, 'model'.. opt.prompt ..'.net')
    os.execute('mkdir -p ' .. sys.dirname(filename))
    print('==> saving model to '..filename)
    torch.save(filename, model)
