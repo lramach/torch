@@ -17,43 +17,7 @@ require 'torch'   -- torch
 require 'xlua'    -- xlua provides useful tools, like progress bars
 require 'optim'   -- an optimization package, for online and batch methods
 
-----------------------------------------------------------------------
--- parse command line arguments
--- if not opt then
-   print '==> processing options'
-   cmd = torch.CmdLine()
-   cmd:text()
-   cmd:text('SVHN Training/Optimization')
-   cmd:text()
-   cmd:text('Options:')
-   cmd:option('-save', 'results', 'subdirectory to save/log experiments in')
-   cmd:option('-visualize', false, 'visualize input data and weights during training')
-   cmd:option('-plot', false, 'live plot')
-   cmd:option('-optimization', 'SGD', 'optimization method: SGD | ASGD | CG | LBFGS')
-   cmd:option('-learningRate', 1e-3, 'learning rate at t=0')
-   cmd:option('-batchSize', 1, 'mini-batch size (1 = pure stochastic)')
-   cmd:option('-weightDecay', 0, 'weight decay (SGD only)')
-   cmd:option('-momentum', 0, 'momentum (SGD only)')
-   cmd:option('-t0', 1, 'start averaging at t0 (ASGD only), in nb of epochs')
-   cmd:option('-maxIter', 2, 'maximum nb of iterations for CG and LBFGS')
---added by lakshmi
-cmd:option('-size', 'small', 'how many samples do we load: small | full | extra')
-cmd:option('-visualize', true, 'visualize input data and weights during training')
--- end of addition
-   cmd:text()
-   opt = cmd:parse(arg or {})
--- end
-
-----------------------------------------------------------------------
--- CUDA?
---if opt.type == 'cuda' then
---   model:cuda()
---   criterion:cuda()
---end
-
-----------------------------------------------------------------------
 print '==> defining some tools'
-
 -- classes
 classes = {'1', '2', '3', '4'} 
 
@@ -62,6 +26,7 @@ confusion = optim.ConfusionMatrix(#classes, classes)
 
 -- Log results to files
 trainLogger = optim.Logger(paths.concat(opt.save, 'train.log'))
+validationLogger = optim.Logger(paths.concat(opt.save, 'validation.log'))
 testLogger = optim.Logger(paths.concat(opt.save, 'test.log'))
 
 -- Retrieve parameters and gradients:
@@ -167,7 +132,7 @@ function train()
 			  local input = inputs[i]
 			  input = input[input:ne(-1)]
 			  local output = model:forward(input)
-			  local err = criterion:forward(output,targets) 
+			  local err = criterion:forward(output,targets[i]) 
 			  f = f + err
 
                           -- estimate df/dW

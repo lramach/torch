@@ -40,12 +40,14 @@ cmd:option('-save', 'results', 'subdirectory to save/log experiments in')
 cmd:option('-plot', false, 'live plot')
 cmd:option('-optimization', 'SGD', 'optimization method: SGD | ASGD | CG | LBFGS')
 cmd:option('-learningRate', 1e-3, 'learning rate at t=0')
-cmd:option('-batchSize', 128, 'mini-batch size (1 = pure stochastic)')
+cmd:option('-batchSize', 50, 'mini-batch size (1 = pure stochastic)')
 cmd:option('-weightDecay', 0, 'weight decay (SGD only)')
 cmd:option('-momentum', 0, 'momentum (SGD only)')
 cmd:option('-t0', 1, 'start averaging at t0 (ASGD only), in nb of epochs')
 cmd:option('-maxIter', 2, 'maximum nb of iterations for CG and LBFGS')
 cmd:option('-type', 'double', 'type: double | float | cuda')
+cmd:option('-visualize', true, 'visualize input data and weights during training')
+-- end of addition
 cmd:text()
 opt = cmd:parse(arg or {})
 print('Printing options')
@@ -70,12 +72,10 @@ dofile '1_data.lua'
 dofile '2_model.lua'
 dofile '3_loss.lua'
 dofile '4_train.lua'
-dofile '5_test.lua'
+dofile '5_validation.lua'
 
 ----------------------------------------------------------------------
-print '==> training!'
-
 while true do --Change this to run for a specific number of epochs
-   train()
-   test()
+    train()
+    validation()
 end

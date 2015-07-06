@@ -4,10 +4,10 @@ require 'nn'
 model = torch.load('results/model.net')
 
 --Load the test data
-dofile '1_load_test_data.lua'
+dofile 'load_test_data.lua'
 
 --Load the test function
-dofile '5_test_only.lua'
+dofile 'test_only.lua'
 --Run test
 print '===> Testing!'
 test()
