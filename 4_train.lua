@@ -128,25 +128,31 @@ function train()
                        local f = 0
 
                        -- evaluate function for complete mini batch
-                       for i = 1,#inputs do
+		       local n = #inputs
+                       for i = 1,n do
                           -- estimate f
 			  local input = inputs[i]
+			  --print(input)
 			  input = input[input:ne(-1)]
-			  local output = model:forward(input)
-			  local err = criterion:forward(output,targets[i]) 
-			  f = f + err
+ 			  if input:nElement() == 0 then
+ 			    n = n-1
+			  else
+                            local output = model:forward(input)
+			    local err = criterion:forward(output,targets[i]) 
+			    f = f + err
 
-                          -- estimate df/dW
-                          local df_do = criterion:backward(output, targets[i])
-                          model:backward(input, df_do)
+                            -- estimate df/dW
+                            local df_do = criterion:backward(output, targets[i])
+                            model:backward(input, df_do)
 
-                          -- update confusion
-                          confusion:add(output, targets[i])
+                            -- update confusion
+                            confusion:add(output, targets[i])
+ 			  end
                        end
 
                        -- normalize gradients and f(X)
-                       gradParameters:div(#inputs)
-                       f = f/#inputs
+                       gradParameters:div(n)
+                       f = f/n
 
                        -- return f and df/dX
                        return f,gradParameters

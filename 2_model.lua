@@ -16,11 +16,23 @@ nhiddens = wordDims
 model = nn.Sequential()
 --Adding fixed lookup to avoid re-weighting the word-vec embeddings
 model:add(kttorch.ImmutableModule(lkptbl)) 
---model:add(lkptbl)
+-- model:add(lkptbl)
 model:add(nn.Mean(1))
+model:add(nn.Linear(wordDims,nhiddens*2))
+model:add(nn.ReLU())
+model:add(nn.Dropout())
+model:add(nn.Linear(nhiddens*2,nhiddens*2))
+model:add(nn.ReLU())
+model:add(nn.Dropout())
+--[[
 model:add(nn.Linear(wordDims,nhiddens))
 model:add(nn.ReLU())
-model:add(nn.Linear(nhiddens,noutputs))
+model:add(nn.Linear(wordDims,nhiddens))
+model:add(nn.ReLU())
+model:add(nn.Linear(wordDims,nhiddens))
+model:add(nn.ReLU())
+--]]
+model:add(nn.Linear(nhiddens*2,noutputs))
 model:add(nn.LogSoftMax())
 
 print '==> Here is the model:'

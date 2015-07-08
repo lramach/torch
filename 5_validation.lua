@@ -40,8 +40,10 @@ function validation()
 
       -- test sample
       input = input[input:ne(-1)]
-      local pred = model:forward(input)
-      confusion:add(pred, target)
+      if input:nElement() > 0 then
+        local pred = model:forward(input)
+        confusion:add(pred, target)
+      end
    end
 
    -- timing
