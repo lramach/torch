@@ -26,9 +26,9 @@ classes = {'1', '2', '3'}
 confusion = optim.ConfusionMatrix(#classes, classes)
 
 -- Log results to files
-trainLogger = optim.Logger(paths.concat(opt.save, 'train.log'))
-validationLogger = optim.Logger(paths.concat(opt.save, 'validation.log'))
-testLogger = optim.Logger(paths.concat(opt.save, 'test.log'))
+trainLogger = optim.Logger(paths.concat(opt.save, 'trainConcatSumMean.log'))
+validationLogger = optim.Logger(paths.concat(opt.save, 'validationConcatSumMean.log'))
+testLogger = optim.Logger(paths.concat(opt.save, 'testConcatSumMean.log'))
 
 -- Retrieve parameters and gradients:
 -- this extracts and flattens all the trainable parameters of the mode

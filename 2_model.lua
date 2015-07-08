@@ -17,10 +17,17 @@ model = nn.Sequential()
 --Adding fixed lookup to avoid re-weighting the word-vec embeddings
 model:add(kttorch.ImmutableModule(lkptbl)) 
 -- model:add(lkptbl)
-model:add(nn.Mean(1))
-model:add(nn.Linear(wordDims,nhiddens*2))
+-- Concatenating Mean and Sum's outputs
+m1 = nn.Concat(1)
+m1:add(nn.Mean(1))
+m1:add(nn.Sum(1))
+model:add(m1) -- Adding the concatenated output to the model
+model:add(nn.Dropout())
+
+model:add(nn.Linear(wordDims*2,nhiddens*2))
 model:add(nn.ReLU())
 model:add(nn.Dropout())
+
 model:add(nn.Linear(nhiddens*2,nhiddens*2))
 model:add(nn.ReLU())
 model:add(nn.Dropout())
