@@ -50,6 +50,7 @@ cmd:option('-type', 'double', 'type: double | float | cuda')
 cmd:option('-visualize', true, 'visualize input data and weights during training')
 -- end of addition
 cmd:option('-prompt', "COSC120275", 'Name of the prompt/dataset')
+cmd:option('-numscores', 3, 'Number of score points in the prompt/dataset')
 --
 cmd:text()
 opt = cmd:parse(arg or {})
@@ -79,6 +80,6 @@ dofile '5_validation.lua'
 --
 ------------------------------------------------------------------------
 while true do --Change this to run for a specific number of epochs
-train()
-validation()
+  train()
+  validation()
 end
