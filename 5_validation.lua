@@ -41,6 +41,11 @@ function validation()
       -- test sample
       input = input[input:ne(-1)]
       if input:nElement() > 0 then
+        m1out = m1:forward(input)
+        m2out = m2:forward(input)
+        input = torch.Tensor(1+m2out:size(1))
+        input[{{1,1}}] = m1out
+        input[{{2, input:size(1)}}] = m2out
         local pred = model:forward(input)
         confusion:add(pred, target)
       end

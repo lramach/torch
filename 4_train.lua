@@ -19,16 +19,16 @@ require 'optim'   -- an optimization package, for online and batch methods
 
 print '==> defining some tools'
 -- classes
--- classes = {'1', '2', '3', '4'} 
-classes = {'1', '2', '3'} 
+--classes = {'1', '2', '3'} 
+--classes = opt.classes
 
 -- This matrix records the current confusion across classes
 confusion = optim.ConfusionMatrix(#classes, classes)
 
 -- Log results to files
-trainLogger = optim.Logger(paths.concat(opt.save, 'trainConcatSumMean.log'))
-validationLogger = optim.Logger(paths.concat(opt.save, 'validationConcatSumMean.log'))
-testLogger = optim.Logger(paths.concat(opt.save, 'testConcatSumMean.log'))
+trainLogger = optim.Logger(paths.concat(opt.save, 'train.log'))
+validationLogger = optim.Logger(paths.concat(opt.save, 'validation.log'))
+testLogger = optim.Logger(paths.concat(opt.save, 'test.log'))
 
 -- Retrieve parameters and gradients:
 -- this extracts and flattens all the trainable parameters of the mode
@@ -105,6 +105,7 @@ function train()
       local targets = {}
       for i = t,math.min(t+opt.batchSize-1,trainData:size()) do
          -- load new sample
+	 -- print(shuffle[i])
          local input = trainData.data[shuffle[i]]
 	 -- target has to be indices of the classes
          local target = trainData.labels[shuffle[i]]
@@ -128,26 +129,33 @@ function train()
                        local f = 0
 
                        -- evaluate function for complete mini batch
-		       local n = #inputs
-                       for i = 1, #inputs do
+		       n = #inputs
+                       for i = 1,#inputs do
                           -- estimate f
 			  local input = inputs[i]
-			  --print(input)
+			  -- print(i)
 			  input = input[input:ne(-1)]
- 			  if input:nElement() == 0 then
- 			    n = n-1
+			  if input:nElement() == 0 then
+			    n = n-1
 			  else
-                            local output = model:forward(input)
-			    local err = criterion:forward(output,targets[i]) 
-			    f = f + err
-
+  			    m1out = m1:forward(input)
+  			    --print(input)
+                            m2out = m2:forward(input)
+  			    input = torch.Tensor(1+m2out:size(1))
+  			    input[{{1,1}}] = m1out
+  			    input[{{2, input:size(1)}}] = m2out
+  			    local output = model:forward(input)
+  			    local err = criterion:forward(output,targets[i]) 
+  			    f = f + err
+  
                             -- estimate df/dW
                             local df_do = criterion:backward(output, targets[i])
-                            model:backward(input, df_do)
-
+                            --print(df_do)
+  			    model:backward(input, df_do)
+  
                             -- update confusion
                             confusion:add(output, targets[i])
- 			  end
+			  end
                        end
 
                        -- normalize gradients and f(X)
@@ -182,7 +190,7 @@ function train()
    end
 
    -- save/log current net
-   local filename = paths.concat(opt.save, 'model'.. opt.prompt ..'.net')
+   local filename = paths.concat(opt.save, 'model' .. opt.prompt .. '.net')
    os.execute('mkdir -p ' .. sys.dirname(filename))
    print('==> saving model to '..filename)
    torch.save(filename, model)
