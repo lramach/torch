@@ -1,22 +1,39 @@
 require 'hdf5';
 
+-- prompt = "COSC120160"
 -- reading in the glove vectors (word-embeddings)
-myFile = hdf5.open('../../data/Colorado/glovevec.'.. opt.prompt ..'.h5', 'r')
+myFile = hdf5.open('../../data/Colorado/fulltrain/glovevec.'.. opt.prompt ..'.h5', 'r')
 df = myFile:read():all()
 glovevec = df.glovevec
 
 -- reading the input, contains the indices of the words
-myFile = hdf5.open('../../data/Colorado/'.. opt.prompt ..'_train.h5', 'r')
+myFile = hdf5.open('../../data/Colorado/fulltrain/'.. opt.prompt ..'_train.h5', 'r')
 df = myFile:read():all()
 trainInput = df.index 
 trainLabels = df.target +1 
 --torch.cat(torch.Tensor(10):fill(1), torch.Tensor(10):fill(2)) 
 
 --reading the validation dataset
-myFile = hdf5.open('../../data/Colorado' .. opt.prompt ..'_validation.h5', 'r')
+myFile = hdf5.open('../../data/Colorado/fulltrain/' .. opt.prompt ..'_validation.h5', 'r')
 df = myFile:read():all()
 validationInput = df.index
 validationLabels = df.target + 1
+
+--reading the references dataset
+myFile = hdf5.open('../../data/Colorado/fulltrain/' .. opt.prompt ..'_references.h5', 'r')
+df = myFile:read():all()
+referencesInput = df.index
+
+
+--reading the character features dataset
+myFile = hdf5.open('../../data/Colorado/chargrams/' .. opt.prompt ..'_train_char3gram.h5', 'r')
+df = myFile:read():all()
+charGramsInputTrain = df.chars
+
+myFile = hdf5.open('../../data/Colorado/chargrams/' .. opt.prompt ..'_validation_char3gram.h5', 'r')
+df = myFile:read():all()
+charGramsInputValidation = df.chars
+
 print '==> loading dataset'
 
 --Loading train data
@@ -34,3 +51,8 @@ validationData = {
 }
 trsize = (#trainInput)[1]
 vasize = (#validationInput)[1]
+
+--Loading the reference vectors
+references = referencesInput --trainInput:index(1, torch.LongTensor({1,2,3,4,5}))
+--print(references)
+

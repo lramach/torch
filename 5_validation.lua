@@ -34,6 +34,7 @@ function validation()
 
       -- get new sample
       local input = validationData.data[t]
+      local charGrams = charGramsInputValidation[t]:double() 
       if opt.type == 'double' then input = input:double()
       elseif opt.type == 'cuda' then input = input:cuda() end
       local target = validationData.labels[t]
@@ -41,6 +42,10 @@ function validation()
       -- test sample
       input = input[input:ne(-1)]
       if input:nElement() > 0 then
+        weOut = weSum:forward(input)
+        input = torch.Tensor(charGrams:size(1)+weOut:size(1))
+        input[{{1,charGrams:size(1)}}] = charGrams
+        input[{{charGrams:size(1)+1, input:size(1)}}] = weOut
         local pred = model:forward(input)
         confusion:add(pred, target)
       end
