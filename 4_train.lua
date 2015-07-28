@@ -129,7 +129,7 @@ function train()
 
                        -- evaluate function for complete mini batch
 		       local n = #inputs
-                       for i = 1,n do
+                       for i = 1, #inputs do
                           -- estimate f
 			  local input = inputs[i]
 			  --print(input)
